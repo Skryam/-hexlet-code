@@ -7,6 +7,6 @@ program
 .arguments('<url>')
 .description('Page loader utility')
 .option('-o, --output [dir]', 'output dir', '/home/user/current-dir')
-.action((url, options) => logic(url, options))
+.action((url, options) => logic(url, options.output))
 
 program.parse(process.argv);

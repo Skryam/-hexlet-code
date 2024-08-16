@@ -13,7 +13,6 @@ export default (url, toSavePath) => {
       else return "-";
     }).join('').concat('.html');
 
-  console.log(savePath, '&&', fileNameToSave)
   const pathToSave = path.join(savePath, fileNameToSave);
 
   return axios.get(url)
