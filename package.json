@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "description": "page-loader",
   "type": "module",
-  "main": "index.js",
+  "main": "bin/page-loader.js",
   "scripts": {
-    "test": "jest"
+    "test": "jest --coverage"
   },
   "repository": {
     "type": "git",
