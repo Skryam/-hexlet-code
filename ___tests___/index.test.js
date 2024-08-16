@@ -12,9 +12,9 @@ const deleteFiles = () => {
   .catch(e => console.log(e));
 }
 
-beforeAll(() => {
+/*beforeAll(() => {
   deleteFiles();
-})
+})*/
 
 let makeTempDir;
 beforeEach(async () => {
