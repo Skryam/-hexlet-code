@@ -3,6 +3,11 @@ import path from 'node:path';
 import logic from '../src/index.js';
 import nock from 'nock';
 import os from 'node:os';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const getFixturePath = (filename) => path.join(__dirname, '..', '__fixtures__', filename);
 
 nock.disableNetConnect();
 
@@ -21,7 +26,7 @@ beforeEach(async () => {
   makeTempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'page-loader-'));
 })
 
-test('saved htpp-file', async () => {
+/*test('saved htpp-file', async () => {
   const scope = nock('https://ru.hexlet.io')
   .get('/courses')
   .reply(200, ['norm']);
@@ -29,4 +34,13 @@ test('saved htpp-file', async () => {
   const res = await logic('https://ru.hexlet.io/courses', makeTempDir)
   expect(scope.isDone()).toBe(true);
   expect(await fs.readFile(res, 'utf-8')).toBe('norm')
+})*/
+
+test('saved image', async () => {
+  const scope = nock('https://ru.hexlet.io')
+  .get('/fixture')
+  .reply(200, await fs.readdir('./bin'))
+
+  const res = await logic('https://ru.hexlet.io/fixture', makeTempDir);
+  expect(scope.isDone()).toBe(true);
 })

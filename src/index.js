@@ -2,6 +2,7 @@ import axios from 'axios';
 import path from 'node:path';
 import fs from 'node:fs/promises'
 import { cwd } from 'node:process';
+import * as cheerio from 'cheerio';
 
 export default (url, toSavePath) => {
   const savePath = toSavePath === '/home/user/current-dir' ? cwd() : toSavePath;
@@ -17,6 +18,9 @@ export default (url, toSavePath) => {
 
   return axios.get(url)
   .then((urlData) => fs.writeFile(pathToSave, urlData.data))
-  .then(() => pathToSave)
+  .then(() => {
+    console.log(pathToSave)
+    return pathToSave
+  })
   .catch((e) => console.log(e))
 }
