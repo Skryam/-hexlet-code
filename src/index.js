@@ -22,7 +22,14 @@ export default (url, toSavePath) => {
   return axios.get(url, { responseType: 'arrayBuffer' })
   .then((urlData) => {
     const $ = cheerio.load(urlData.data);
-    console.log($('img').attr('src'))
+    const imgTags = $('img');
+const srcLinks = [];
+
+imgTags.each((index, img) => {
+  srcLinks.push($(img).attr('src'));
+});
+
+console.log(srcLinks);
 
     //fs.writeFile(pathToSaveHTML, urlData.data)
     //.then(() => fs.mkdir(pathToFiles))
