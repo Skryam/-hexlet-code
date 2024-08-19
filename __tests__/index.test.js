@@ -23,7 +23,7 @@ const deleteFiles = () => {
 
 let makeTempDir;
 beforeEach(async () => {
-  makeTempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'page-loader-'));
+  makeTempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'test', 'page-loader-'));
 })
 
 /*test('saved htpp-file', async () => {
@@ -39,7 +39,7 @@ beforeEach(async () => {
 test('saved image', async () => {
   const scope = nock('https://ru.hexlet.io')
   .get('/fixture')
-  .reply(200, await fs.readdir('./bin'))
+  .reply(200, await fs.readFile('./__fixtures__/courses.html'))
 
   const res = await logic('https://ru.hexlet.io/fixture', makeTempDir);
   expect(scope.isDone()).toBe(true);
