@@ -39,8 +39,13 @@ beforeEach(async () => {
 test('saved image', async () => {
   const scope = nock('https://ru.hexlet.io')
   .get('/fixture')
-  .reply(200, await fs.readFile('./__fixtures__/courses.html'))
+  .reply(200, await fs.readFile('./__fixtures__/courses.html'));
+
+  const scopeIMG = nock('https://ru.hexlet.io')
+  .get('/nodejs.png')
+  .reply(200, await fs.readFile('./__fixtures__/nodejs.png'))
 
   const res = await logic('https://ru.hexlet.io/fixture', makeTempDir);
   expect(scope.isDone()).toBe(true);
+  expect(scopeIMG.isDone()).toBe(true);
 })

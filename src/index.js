@@ -3,7 +3,6 @@ import * as cheerio from 'cheerio';
 import path from 'node:path';
 import fs from 'node:fs/promises'
 import { cwd } from 'node:process';
-import { createWriteStream } from 'node:fs';
 
 export default (url, toSavePath) => {
   const savePath = toSavePath === '/home/user/current-dir' ? cwd() : toSavePath;
@@ -19,20 +18,18 @@ export default (url, toSavePath) => {
   const pathToSaveHTML = path.join(savePath, generateName('.html'));
   const pathToFiles = path.join(savePath, generateName('_files'));
 
-  return axios.get(url, { responseType: 'arrayBuffer' })
+  return axios.get(url)
   .then((urlData) => {
     const $ = cheerio.load(urlData.data);
-    const imgTags = $('img');
-const srcLinks = [];
+    const srcLinks = [];
+    $('img').each((index, img) => srcLinks.push($(img).attr('src')))
 
-imgTags.each((index, img) => {
-  srcLinks.push($(img).attr('src'));
-});
-
-console.log(srcLinks);
-
-    //fs.writeFile(pathToSaveHTML, urlData.data)
-    //.then(() => fs.mkdir(pathToFiles))
+    fs.writeFile(pathToSaveHTML, urlData.data)
+    .then(() => fs.mkdir(pathToFiles))
+    .then(() => srcLinks.forEach((link) => {
+      axios.get(link, { responseType: 'arrayBuffer' })
+      .then((data) => data)//fs.writeFile(path.join(pathToFiles, generateName), data))
+    }))
   })
 
   .then(() => {
