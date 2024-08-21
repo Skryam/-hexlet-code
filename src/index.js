@@ -19,17 +19,22 @@ export default (url, toSavePath) => {
   const pathToFiles = path.join(savePath, generateName('_files'));
 
   return axios.get(url)
-  .then((urlData) => {
-    const $ = cheerio.load(urlData.data);
+  .then((response) => {
+    const $ = cheerio.load(response.data);
     const srcLinks = [];
     $('img').each((index, img) => srcLinks.push($(img).attr('src')))
-
-    fs.writeFile(pathToSaveHTML, urlData.data)
+    //сохранение разметки
+    fs.writeFile(pathToSaveHTML, response.data)
+    //создание папки для файлов
     .then(() => fs.mkdir(pathToFiles))
+    //сохранение пикч
     .then(() => srcLinks.forEach((link) => {
-      axios.get(link, { responseType: 'arrayBuffer' })
-      .then((data) => data)//fs.writeFile(path.join(pathToFiles, generateName), data))
+      axios.get(takeURL.href + link, { responseType: 'stream' })
+      .then((response) => {
+        fs.writeFile(path.join(pathToFiles, generateName('.png')), response.data)
+      })
     }))
+    //изменение ссылок в разметке
   })
 
   .then(() => {

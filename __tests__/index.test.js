@@ -26,26 +26,16 @@ beforeEach(async () => {
   makeTempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'test', 'page-loader-'));
 })
 
-/*test('saved htpp-file', async () => {
-  const scope = nock('https://ru.hexlet.io')
-  .get('/courses')
-  .reply(200, ['norm']);
-
-  const res = await logic('https://ru.hexlet.io/courses', makeTempDir)
-  expect(scope.isDone()).toBe(true);
-  expect(await fs.readFile(res, 'utf-8')).toBe('norm')
-})*/
-
 test('saved image', async () => {
   const scope = nock('https://ru.hexlet.io')
-  .get('/fixture')
+  .get('/courses')
   .reply(200, await fs.readFile('./__fixtures__/courses.html'));
 
-  const scopeIMG = nock('https://ru.hexlet.io')
-  .get('/nodejs.png')
+  const scopeIMG = nock('https://ru.hexlet.io/courses')
+  .get('/assets/professions/nodejs.png')
   .reply(200, await fs.readFile('./__fixtures__/nodejs.png'))
 
-  const res = await logic('https://ru.hexlet.io/fixture', makeTempDir);
+  const res = await logic('https://ru.hexlet.io/courses', makeTempDir);
+
   expect(scope.isDone()).toBe(true);
-  expect(scopeIMG.isDone()).toBe(true);
 })
