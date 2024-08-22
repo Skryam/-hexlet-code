@@ -17,28 +17,31 @@ export default (url, toSavePath) => {
 
   const pathToSaveHTML = path.join(savePath, generateName('.html'));
   const pathToFiles = path.join(savePath, generateName('_files'));
+  let $;
 
   return axios.get(url)
   .then((response) => {
-    const $ = cheerio.load(response.data);
-    const srcLinks = [];
-    $('img').each((index, img) => srcLinks.push($(img).attr('src')))
-    //сохранение разметки
-    fs.writeFile(pathToSaveHTML, response.data)
-    //создание папки для файлов
-    .then(() => fs.mkdir(pathToFiles))
-    //сохранение пикч
-    .then(() => srcLinks.forEach((link) => {
-      axios.get(takeURL.href + link, { responseType: 'stream' })
-      .then((response) => {
-        fs.writeFile(path.join(pathToFiles, generateName('.png')), response.data)
-      })
-    }))
-    //изменение ссылок в разметке
+  $ = cheerio.load(response.data);
   })
+  //создание папки для файлов
+  .then(() => fs.mkdir(pathToFiles))
+  //сохранение пикч
+  .then(() => {
+    $('img').each((index, img) => {
+      axios.get(takeURL.href + $(img).attr("src"), { responseType: 'stream' })
+    })
+  })
+  .then((response) => {
+    const savePicPath = path.join(pathToFiles, generateName(link.match(/\.[^.]+$/)));
+    $(`img[src=${link}]`).attr('src', savePicPath)
+    console.log($.html())
+    fs.writeFile(savePicPath, response.data)
+  })
+  //изменение ссылок в разметке и её сохранение
+  .then(() => console.log($.html()))
+  //.then(() => fs.writeFile(pathToSaveHTML, $.html())))
 
   .then(() => {
-    console.log(savePath)
     return savePath
   })
   .catch((e) => console.log(e))

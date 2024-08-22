@@ -32,8 +32,8 @@ test('saved image', async () => {
   .reply(200, await fs.readFile('./__fixtures__/courses.html'));
 
   const scopeIMG = nock('https://ru.hexlet.io/courses')
-  .get('/assets/professions/nodejs.png')
-  .reply(200, await fs.readFile('./__fixtures__/nodejs.png'))
+  .get('/assets/professions/nodejs.jpg')
+  .reply(200, await fs.readFile('./__fixtures__/nodejs.jpg'))
 
   const res = await logic('https://ru.hexlet.io/courses', makeTempDir);
 
