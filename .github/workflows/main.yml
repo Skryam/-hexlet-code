@@ -9,31 +9,7 @@ jobs:
 
       - name: Set up Node.js
         uses: actions/setup-node@v3
-        with:name: Tests
-on: [push]
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
         with:
-          node-version: latest
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Test & publish code coverage
-        uses: paambaati/codeclimate-action@v2.5.7
-        env: 
-          CC_TEST_REPORTER_ID: ${{ secrets.CODECLIMATE_ID }}
-        with:
-          coverageCommand: npm run test
-          debug: true
-
           node-version: latest
 
       - name: Install dependencies
