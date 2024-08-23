@@ -40,8 +40,8 @@ test('saved image', async () => {
 
   const result = cheerio.load(await fs.readFile(fun, 'utf8'))('img').attr('src');
 
-  expect(result.includes('Temp\\page-loader-')
-  && result.includes('ru-hexlet-io-courses_files\\ru-hexlet-io-courses.jpg')).toBeTruthy();
+  expect(result.match(/Temp.page-loader/)
+  && result.match(/ru-hexlet-io-courses_files.ru-hexlet-io-courses.jpg/)).toBeTruthy();
   expect(await fs.readFile(path.join(fun, '..', 'ru-hexlet-io-courses_files', 'ru-hexlet-io-courses.jpg'), 'utf8')).toBe(
     await fs.readFile(getFixturePath('nodejs.jpg'), 'utf8')
   )
