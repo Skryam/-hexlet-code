@@ -24,7 +24,7 @@ const deleteFiles = () => {
 
 let makeTempDir;
 beforeEach(async () => {
-  makeTempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'test', 'page-loader-'));
+  makeTempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'page-loader-'));
 })
 
 test('saved image', async () => {
