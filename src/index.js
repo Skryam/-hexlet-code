@@ -17,14 +17,13 @@ export default (url, toSavePath) => {
 
   const pathToSaveHTML = path.join(savePath, generateName('.html'));
   const pathToFiles = path.join(savePath, generateName('_files'));
-  let $;
 
   //создание папки для файлов
   return fs.mkdir(pathToFiles)
   .then(() => axios.get(url))
   .then((response) => cheerio.load(response.data))
   .then(($) => {
-    const ap = $('img').map((index, img) => {
+    const promisesArr = $('img').map((index, img) => {
     return axios.get(takeURL.href + $(img).attr("src"), { responseType: 'stream' })
     .then((response) => {
     const link = $(img).attr("src");
@@ -33,13 +32,14 @@ export default (url, toSavePath) => {
     return fs.writeFile(savePicPath, response.data)
       })
     })
-    return Promise.all(ap).then(() => $)
+    return Promise.all(promisesArr).then(() => $)
   })
   //изменение ссылок в разметке и её сохранение
   .then(($) => fs.writeFile(pathToSaveHTML, $.html()))
 
   .then(() => {
-    return savePath
+    console.log(pathToSaveHTML)
+    return pathToSaveHTML
   })
   .catch((e) => console.log(e))
 }

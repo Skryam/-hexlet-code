@@ -1,4 +1,5 @@
 import fs from 'node:fs/promises';
+import * as cheerio from 'cheerio';
 import path from 'node:path';
 import logic from '../src/index.js';
 import nock from 'nock';
@@ -27,15 +28,21 @@ beforeEach(async () => {
 })
 
 test('saved image', async () => {
-  const scope = nock('https://ru.hexlet.io')
+  nock('https://ru.hexlet.io')
   .get('/courses')
   .reply(200, await fs.readFile('./__fixtures__/courses.html'));
 
-  const scopeIMG = nock('https://ru.hexlet.io/courses')
+  nock('https://ru.hexlet.io/courses')
   .get('/assets/professions/nodejs.jpg')
   .reply(200, await fs.readFile('./__fixtures__/nodejs.jpg'))
 
-  const res = await logic('https://ru.hexlet.io/courses', makeTempDir);
+  const fun = await logic('https://ru.hexlet.io/courses', makeTempDir);
 
-  expect(scope.isDone()).toBe(true);
+  const result = cheerio.load(await fs.readFile(fun, 'utf8'))('img').attr('src');
+
+  expect(result.includes('AppData\\Local\\Temp\\test\\page-loader-')
+&& result.includes('ru-hexlet-io-courses_files\\ru-hexlet-io-courses.jpg')).toBeTruthy();
+  expect(await fs.readFile(path.join(fun, '..', 'ru-hexlet-io-courses_files', 'ru-hexlet-io-courses.jpg'), 'utf8')).toBe(
+    await fs.readFile(getFixturePath('nodejs.jpg'), 'utf8')
+  )
 })
