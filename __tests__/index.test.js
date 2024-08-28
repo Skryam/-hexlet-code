@@ -32,15 +32,19 @@ test('saved image', async () => {
   .get('/courses')
   .reply(200, await fs.readFile('./__fixtures__/courses.html'));
 
-  nock('https://ru.hexlet.io/courses')
+  nock('https://ru.hexlet.io')
+  .get('/courses')
+  .reply(200, await fs.readFile('./__fixtures__/courses.html'));
+
+  nock('https://ru.hexlet.io')
   .get('/assets/professions/nodejs.jpg')
   .reply(200, await fs.readFile('./__fixtures__/nodejs.jpg'))
 
-  nock('https://ru.hexlet.io/courses')
+  nock('https://ru.hexlet.io')
   .get('/assets/application.css')
   .reply(200, await fs.readFile('./__fixtures__/application.css'))
 
-  nock('https://ru.hexlet.io/courses')
+  nock('https://ru.hexlet.io')
   .get('/packs/js/runtime.js')
   .reply(200, await fs.readFile('./__fixtures__/runtime.js'))
 

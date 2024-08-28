@@ -13,7 +13,7 @@ export default (url, toSavePath) => {
     .map((elem) => {
       if (/[a-zA-Z0-9]/.test(elem)) return elem;
       else return "-";
-    }).join('').concat(format);
+    }).join('').concat(format ?? '.html');
 
   const pathToSaveHTML = path.join(savePath, generateName('.html'));
   const pathToFiles = path.join(savePath, generateName('_files'));
@@ -32,18 +32,14 @@ export default (url, toSavePath) => {
       return $(tag).map((index, item) => {
         const source = $(item).attr(src);
         const check = new URL(source, takeURL.href);
-        if (check.host !== takeURL.host) {
-          return;
-        }
+        if (check.host !== takeURL.host) return;
         else {
-          const res = new URL(takeURL.pathname + check.pathname, takeURL.href)
-          console.log(res.href)
-          return axios.get(res.href, { responseType: 'stream' })
-        .then((response) => {
           const savePicPath = path.join(pathToFiles, generateName(source.match(/\.[^.]+$/)));
-          $(`${tag}[${src}=${source}]`).attr(src, savePicPath)
-          return fs.writeFile(savePicPath, response.data)
-        })
+          const getFile = axios.get(check.href, { responseType: 'stream' })
+          .then((response) => {
+            return fs.writeFile(savePicPath, response.data)
+          })
+        $(`${tag}[${src}=${source}]`).attr(src, savePicPath)
       }
       })
     })
