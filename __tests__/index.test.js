@@ -36,6 +36,14 @@ test('saved image', async () => {
   .get('/assets/professions/nodejs.jpg')
   .reply(200, await fs.readFile('./__fixtures__/nodejs.jpg'))
 
+  nock('https://ru.hexlet.io/courses')
+  .get('/assets/application.css')
+  .reply(200, await fs.readFile('./__fixtures__/application.css'))
+
+  nock('https://ru.hexlet.io/courses')
+  .get('/packs/js/runtime.js')
+  .reply(200, await fs.readFile('./__fixtures__/runtime.js'))
+
   const fun = await logic('https://ru.hexlet.io/courses', makeTempDir);
 
   const result = cheerio.load(await fs.readFile(fun, 'utf8'))('img').attr('src');

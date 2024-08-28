@@ -24,23 +24,30 @@ export default (url, toSavePath) => {
   .then((response) => cheerio.load(response.data))
   .then(($) => {
     //пикчи
-    const promisesImg = $('img').map((index, img) => {
-      const source = $(img).attr("src");
-      return axios.get(takeURL.href + source, { responseType: 'stream' })
-      .then((response) => {
-        const savePicPath = path.join(pathToFiles, generateName(source.match(/\.[^.]+$/)));
-        $(`img[src=${source}]`).attr('src', savePicPath)
-        return fs.writeFile(savePicPath, response.data)
+    const promises = [
+      ["link", "href"],
+      ["img", "src"],
+      ["script", "src"],
+    ].map(([tag, src]) => {
+      return $(tag).map((index, item) => {
+        const source = $(item).attr(src);
+        const check = new URL(source, takeURL.href);
+        if (check.host !== takeURL.host) {
+          return;
+        }
+        else {
+          const res = new URL(takeURL.pathname + check.pathname, takeURL.href)
+          console.log(res.href)
+          return axios.get(res.href, { responseType: 'stream' })
+        .then((response) => {
+          const savePicPath = path.join(pathToFiles, generateName(source.match(/\.[^.]+$/)));
+          $(`${tag}[${src}=${source}]`).attr(src, savePicPath)
+          return fs.writeFile(savePicPath, response.data)
+        })
+      }
       })
     })
-    const promisesLink = $('link').map((index, link) => {
-      const source = $(link).attr('src');
-      return axios.get(takeURL.href + source, { responseType: 'stream' })
-      .then((response) => {
-      })
-    })
-
-    return Promise.all(promisesImg).then(() => $)
+    return Promise.all(promises).then(() => $)
   })
   //изменение ссылок в разметке и её сохранение
   .then(($) => fs.writeFile(pathToSaveHTML, $.html()))
