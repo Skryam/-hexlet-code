@@ -1,10 +1,10 @@
 import fs from 'node:fs/promises';
 import * as cheerio from 'cheerio';
 import path from 'node:path';
-import logic from '../src/index.js';
 import nock from 'nock';
 import os from 'node:os';
 import { fileURLToPath } from 'url';
+import logic from '../src/index.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -14,39 +14,39 @@ nock.disableNetConnect();
 
 const deleteFiles = () => {
   fs.readdir(os.tmpdir())
-  .then((files) => files.filter(f => f.match(/page-loader-.*/)).forEach(del => fs.rmdir(`${os.tmpdir()}/${del}`, {recursive: true})))
-  .catch(e => console.log(e));
-}
+    .then((files) => files.filter((f) => f.match(/page-loader-.*/)).forEach((del) => fs.rmdir(`${os.tmpdir()}/${del}`, { recursive: true })))
+    .catch((e) => console.log(e));
+};
 
-/*beforeAll(() => {
+/* beforeAll(() => {
   deleteFiles();
-})*/
+}) */
 
 let makeTempDir;
 beforeEach(async () => {
   makeTempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'page-loader-'));
-})
+});
 
 test('saved image', async () => {
   nock('https://ru.hexlet.io')
-  .get('/courses')
-  .reply(200, await fs.readFile('./__fixtures__/courses.html'));
+    .get('/courses')
+    .reply(200, await fs.readFile('./__fixtures__/courses.html'));
 
   nock('https://ru.hexlet.io')
-  .get('/courses')
-  .reply(200, await fs.readFile('./__fixtures__/courses.html'));
+    .get('/courses')
+    .reply(200, await fs.readFile('./__fixtures__/courses.html'));
 
   nock('https://ru.hexlet.io')
-  .get('/assets/professions/nodejs.jpg')
-  .reply(200, await fs.readFile('./__fixtures__/nodejs.jpg'))
+    .get('/assets/professions/nodejs.jpg')
+    .reply(200, await fs.readFile('./__fixtures__/nodejs.jpg'));
 
   nock('https://ru.hexlet.io')
-  .get('/assets/application.css')
-  .reply(200, await fs.readFile('./__fixtures__/application.css'))
+    .get('/assets/application.css')
+    .reply(200, await fs.readFile('./__fixtures__/application.css'));
 
   nock('https://ru.hexlet.io')
-  .get('/packs/js/runtime.js')
-  .reply(200, await fs.readFile('./__fixtures__/runtime.js'))
+    .get('/packs/js/runtime.js')
+    .reply(200, await fs.readFile('./__fixtures__/runtime.js'));
 
   const fun = await logic('https://ru.hexlet.io/courses', makeTempDir);
 
@@ -55,6 +55,6 @@ test('saved image', async () => {
   expect(result.match(/page-loader/)
   && result.match(/ru-hexlet-io-courses_files.ru-hexlet-io-courses.jpg/)).toBeTruthy();
   expect(await fs.readFile(path.join(fun, '..', 'ru-hexlet-io-courses_files', 'ru-hexlet-io-courses.jpg'), 'utf8')).toBe(
-    await fs.readFile(getFixturePath('nodejs.jpg'), 'utf8')
-  )
-})
+    await fs.readFile(getFixturePath('nodejs.jpg'), 'utf8'),
+  );
+});
