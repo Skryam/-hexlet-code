@@ -5,6 +5,7 @@ import nock from 'nock';
 import os from 'node:os';
 import { fileURLToPath } from 'url';
 import logic from '../src/index.js';
+import debug from 'debug';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
