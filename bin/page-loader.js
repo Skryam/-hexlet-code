@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { program } from 'commander';
 import logic from '../src/index.js';
+import debug from 'debug';
 
 program
   .version('1.0.0', '-V, --version', 'output the version number')
