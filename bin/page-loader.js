@@ -2,6 +2,11 @@
 import { program } from 'commander';
 import logic from '../src/index.js';
 import debug from 'debug';
+import axiosDebug from 'axios-debug-log';
+const pageLoaderDebug = debug('page-loader');
+pageLoaderDebug('enabled');
+
+require('axios-debug-log');
 
 program
   .version('1.0.0', '-V, --version', 'output the version number')
@@ -11,4 +16,4 @@ program
   .action((url, options) => logic(url, options.output));
 
 program.parse(process.argv);
-debug('page-lodaer')
+axiosDebug('page-lodaer')

@@ -3,6 +3,8 @@ import * as cheerio from 'cheerio';
 import path from 'node:path';
 import fs from 'node:fs/promises';
 import { cwd } from 'node:process';
+import debug from 'debug';
+import axiosDebug from 'axios-debug-log';
 
 export default (url, toSavePath) => {
   const savePath = toSavePath === '/home/user/current-dir' ? cwd() : toSavePath;
