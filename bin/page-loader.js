@@ -11,3 +11,4 @@ program
   .action((url, options) => logic(url, options.output));
 
 program.parse(process.argv);
+debug('page-lodaer')
