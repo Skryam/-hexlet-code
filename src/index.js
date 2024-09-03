@@ -29,6 +29,7 @@ export default (url, toSavePath) => {
         ['script', 'src'],
       ].map(([tag, src]) => $(tag).map((index, item) => {
         const source = $(item).attr(src);
+        if (source === undefined) return;
         const check = new URL(source, takeURL.href);
         if (check.host !== takeURL.host) return;
 
