@@ -8,14 +8,19 @@ export default (url, toSavePath) => {
   const savePath = toSavePath === '/home/user/current-dir' ? cwd() : toSavePath;
   const takeURL = new URL(url);
 
-  const generateName = (format) => `${takeURL.hostname}${takeURL.pathname}`.split('')
+  const generateName = (src) => {
+    const extension = path.extname(src) ? path.extname(src) : '.html'
+    const sliceExtension = src.replace(extension, '');
+
+    `${takeURL.hostname}${takeURL.pathname}`.split('')
     .map((elem) => {
       if (/[a-zA-Z0-9]/.test(elem)) return elem;
       return '-';
-    }).join('').concat(format ?? '.html');
+    }).join('').concat(extension);
+  }
 
-  const pathToSaveHTML = path.join(savePath, generateName('.html'));
-  const pathToFiles = path.join(savePath, generateName('_files'));
+  const pathToSaveHTML = path.join(savePath + '.html');
+  const pathToFiles = path.join(savePath +'_files');
 
   // создание папки для файлов
   return fs.mkdir(pathToFiles)
@@ -33,9 +38,12 @@ export default (url, toSavePath) => {
         const check = new URL(source, takeURL.href);
         if (check.host !== takeURL.host) return;
 
-        const savePicPath = path.join(pathToFiles, generateName(source.match(/\.[^.]+$/)));
+        const savePicPath = path.join(pathToFiles, generateName(source));
         const getFile = axios.get(check.href, { responseType: 'stream' })
-          .then((response) => fs.writeFile(savePicPath, response.data));
+          .then((response) => {
+            console.log(source)
+            fs.writeFile(savePicPath, response.data)
+          });
         // изменение ссылок в разметке
         $(`${tag}[${src}=${source}]`).attr(src, savePicPath);
       }));
