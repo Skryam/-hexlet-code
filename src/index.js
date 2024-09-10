@@ -8,19 +8,20 @@ export default (url, toSavePath) => {
   const savePath = toSavePath === '/home/user/current-dir' ? cwd() : toSavePath;
   const takeURL = new URL(url);
 
-  const generateName = (src) => {
+  const generateName = (src = url) => {
     const extension = path.extname(src) ? path.extname(src) : '.html'
     const sliceExtension = src.replace(extension, '');
 
-    `${takeURL.hostname}${takeURL.pathname}`.split('')
+    return `${takeURL.hostname}${takeURL.pathname}`.split('')
     .map((elem) => {
       if (/[a-zA-Z0-9]/.test(elem)) return elem;
       return '-';
     }).join('').concat(extension);
   }
 
-  const pathToSaveHTML = path.join(savePath + '.html');
-  const pathToFiles = path.join(savePath +'_files');
+  const baseURLName = generateName();
+  const pathToSaveHTML = path.join(savePath, baseURLName);
+  const pathToFiles = path.join(savePath, baseURLName.replace('.html', '_files'));
 
   // создание папки для файлов
   return fs.mkdir(pathToFiles)
@@ -41,7 +42,6 @@ export default (url, toSavePath) => {
         const savePicPath = path.join(pathToFiles, generateName(source));
         const getFile = axios.get(check.href, { responseType: 'stream' })
           .then((response) => {
-            console.log(source)
             fs.writeFile(savePicPath, response.data)
           });
         // изменение ссылок в разметке
@@ -50,10 +50,15 @@ export default (url, toSavePath) => {
       return Promise.all(promises).then(() => $);
     })
   // сохранение разметки
-    .then(($) => fs.writeFile(pathToSaveHTML, $.html()))
-
+  
+    .then(($) => {
+      return fs.writeFile(pathToSaveHTML, $.html())
+    })
     .then(() => {
       return pathToSaveHTML;
     })
-    .catch((e) => console.log(e));
+    .catch((e) => {
+      console.error(`Выполнение программы завершилось по ошибке:\n${e}`);
+      throw new Error(e)
+    });
 };

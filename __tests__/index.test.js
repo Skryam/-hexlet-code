@@ -24,7 +24,7 @@ const deleteFiles = () => {
 
 let makeTempDir;
 beforeEach(async () => {
-  makeTempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'page-loader-'));
+  makeTempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'test', 'page-loader-'));
 });
 
 test('saved image', async () => {
@@ -54,7 +54,48 @@ test('saved image', async () => {
 
   expect(result.match(/page-loader/)
   && result.match(/ru-hexlet-io-courses_files.ru-hexlet-io-courses.jpg/)).toBeTruthy();
+
   expect(await fs.readFile(path.join(fun, '..', 'ru-hexlet-io-courses_files', 'ru-hexlet-io-courses.jpg'), 'utf8')).toBe(
     await fs.readFile(getFixturePath('nodejs.jpg'), 'utf8'),
   );
+});
+
+test('error 400', async () => {
+  nock('https://ru.hexlet.io')
+    .get('/courses')
+    .reply(400);
+
+  await expect(logic('https://ru.hexlet.io/courses', makeTempDir)).rejects.toThrowError();
+});
+
+test('error 403', async () => {
+  nock('https://ru.hexlet.io')
+    .get('/courses')
+    .reply(403);
+
+  await expect(logic('https://ru.hexlet.io/courses', makeTempDir)).rejects.toThrowError();
+});
+
+test('error 502', async () => {
+  nock('https://ru.hexlet.io')
+    .get('/courses')
+    .reply(502);
+
+  await expect(logic('https://ru.hexlet.io/courses', makeTempDir)).rejects.toThrowError();
+});
+
+test('error 304', async () => {
+  nock('https://ru.hexlet.io')
+    .get('/courses')
+    .reply(304);
+
+  await expect(logic('https://ru.hexlet.io/courses', makeTempDir)).rejects.toThrowError();
+});
+
+test('ошибочный путь к сохранению', async () => {
+  nock('https://ru.hexlet.io')
+    .get('/courses')
+    .reply(200);
+
+  await expect(logic('https://ru.hexlet.io/courses', 'error')).rejects.toThrowError();
 });

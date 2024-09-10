@@ -24,6 +24,14 @@ program
   .arguments('<url>')
   .description('Page loader utility')
   .option('-o, --output [dir]', 'output dir', '/home/user/current-dir')
-  .action((url, options) => logic(url, options.output));
+  .action((url, options) => {
+    try {
+    logic(url, options.output)
+    }
+    catch (e) {
+      console.error(`Выполнение программы завершилось по ошибке: ${e.message}`);
+      process.exit(1);
+    }
+  });
 
 program.parse(process.argv);
