@@ -23,7 +23,7 @@ const deleteFiles = () => {
 }) */
 
 let makeTempDir;
-beforeEach(async () => {
+beforeAll(async () => {
   makeTempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'page-loader-'));
 });
 
