@@ -1,8 +1,10 @@
 #!/usr/bin/env node
+import { cwd } from 'node:process';
 import { program } from 'commander';
 import axiosDebug from 'axios-debug-log';
 import logic from '../src/index.js';
 import 'axios-debug-log/enable.js';
+
 // Log content type
 axiosDebug({
   request(debug, config) {
@@ -26,9 +28,9 @@ program
   .option('-o, --output [dir]', 'output dir', '/home/user/current-dir')
   .action((url, options) => {
     try {
-      logic(url, options.output);
+      const pathToSave = options.output === '/home/user/current-dir' ? cwd() : options.output;
+      logic(url, pathToSave);
     } catch (e) {
-      console.error(`Выполнение программы завершилось по ошибке: ${e.message}`);
       process.exit(1);
     }
   });

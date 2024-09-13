@@ -1,24 +1,14 @@
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import * as cheerio from 'cheerio';
 import path from 'node:path';
 import fs from 'node:fs/promises';
-import { cwd } from 'node:process';
-import Listr from 'listr';
+import generateName from './generateName.js';
+import downloadSources from './downloadSources.js';
 
-export default (url, savePath = cwd()) => {
+export default (url, savePath) => {
   const takeURL = new URL(url);
 
-  const generateName = (src = url) => {
-    const extension = path.extname(src) ? path.extname(src) : '.html';
-
-    return `${takeURL.hostname}${takeURL.pathname}`.split('')
-      .map((elem) => {
-        if (/[a-zA-Z0-9]/.test(elem)) return elem;
-        return '-';
-      }).join('').concat(extension);
-  };
-
-  const baseURLName = generateName();
+  const baseURLName = generateName(takeURL);
   const pathToSaveHTML = path.join(savePath, baseURLName);
   const pathToFiles = path.join(savePath, baseURLName.replace('.html', '_files'));
 
@@ -26,46 +16,20 @@ export default (url, savePath = cwd()) => {
   return fs.mkdir(pathToFiles)
     .then(() => axios.get(url))
     .then((response) => cheerio.load(response.data))
-    .then(($) => {
-    // ресурсы
-      const promises = [
-        ['link', 'href'],
-        ['img', 'src'],
-        ['script', 'src'],
-      ].map(([tag, src]) => $(tag).map((index, item) => {
-        new Listr([
-          {
-            title: `check for local resourse: ${$(item).attr(src)}`,
-            task: () => {
-              const source = $(item).attr(src);
-              if (source === undefined) return;
-              const check = new URL(source, takeURL.href);
-              if (check.host !== takeURL.host) return;
-
-              const savePicPath = path.join(pathToFiles, generateName(source));
-
-              axios.get(check.href, { responseType: 'stream' })
-                .then((response) => {
-                  fs.writeFile(savePicPath, response.data);
-                });
-              // изменение ссылок в разметке
-              $(`${tag}[${src}=${source}]`).attr(src, savePicPath);
-            },
-          },
-        ], { concurrent: true }).run();
-      }));
-
-      return Promise.all(promises).then(() => $);
-    })
+  // сохранение файлов
+    .then(($) => downloadSources($, takeURL))
   // сохранение разметки
-
     .then(($) => fs.writeFile(pathToSaveHTML, $.html()))
     .then(() => {
       console.log(pathToSaveHTML);
       return pathToSaveHTML;
     })
     .catch((e) => {
-      console.error(`Выполнение программы завершилось по ошибке:\n${e}`);
+      if (e instanceof AxiosError) {
+        console.error('ИНЕТ БЛЯ НЕ ГРУЗИТ ААААА');
+        throw new Error(e);
+      }
+      console.error('НИХУЯ НЕ РАБОТАЕТ');
       throw new Error(e);
     });
 };
