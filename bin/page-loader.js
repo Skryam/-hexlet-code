@@ -3,7 +3,6 @@ import { cwd } from 'node:process';
 import { program } from 'commander';
 import axiosDebug from 'axios-debug-log';
 import logic from '../src/index.js';
-import 'axios-debug-log/enable.js';
 
 // Log content type
 axiosDebug({
@@ -25,11 +24,10 @@ program
   .version('1.0.0', '-V, --version', 'output the version number')
   .arguments('<url>')
   .description('Page loader utility')
-  .option('-o, --output [dir]', 'output dir', '/home/user/current-dir')
+  .option('-o, --output [dir]', 'output dir', cdw())
   .action((url, options) => {
     try {
-      const pathToSave = options.output === '/home/user/current-dir' ? cwd() : options.output;
-      logic(url, pathToSave);
+      logic(url, options.output);
     } catch (e) {
       process.exit(1);
     }

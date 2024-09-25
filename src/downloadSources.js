@@ -11,9 +11,9 @@ export default ($, takeURL, pathToFiles) => {
     const link = $(item).attr('href') || $(item).attr('src');
     new Listr([
       {
-        title: `check for local resourse: ${link}`,
+        title: `download re: ${link}`,
         task: () => {
-          if (link === undefined) return;
+          if (!link) return;
           const check = new URL(link, takeURL.href);
           if (check.host !== takeURL.host) return;
 
@@ -31,7 +31,7 @@ export default ($, takeURL, pathToFiles) => {
           }
         },
       },
-    ], { concurrent: true }).run();
+    ]).run();
   });
 
   return Promise.all(promises).then(() => $);
