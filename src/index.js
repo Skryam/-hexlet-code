@@ -17,19 +17,19 @@ export default (url, savePath) => {
     .then(() => axios.get(url))
     .then((response) => cheerio.load(response.data))
   // сохранение файлов
-    .then(($) => downloadSources($, takeURL))
+    .then(($) => downloadSources($, takeURL, pathToFiles))
   // сохранение разметки
     .then(($) => fs.writeFile(pathToSaveHTML, $.html()))
     .then(() => {
       console.log(pathToSaveHTML);
       return pathToSaveHTML;
     })
-    .catch((e) => {
+    /*.catch((e) => {
       if (e instanceof AxiosError) {
         console.error('ИНЕТ БЛЯ НЕ ГРУЗИТ ААААА');
         throw new Error(e);
       }
       console.error('НИХУЯ НЕ РАБОТАЕТ');
       throw new Error(e);
-    });
+    }); */
 };
