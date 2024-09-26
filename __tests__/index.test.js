@@ -48,7 +48,15 @@ describe('Загрузка разметки и файлов', () => {
   });
 
   test('img', async () => {
-    expect(readFile('assets-professions-nodejs.jpg')).toBe(readFixturePath('nodejs.jpg'));
+    expect(await readFile('assets-professions-nodejs.jpg')).toBe(await readFixturePath('nodejs.jpg'));
+  });
+
+  test('link', async () => {
+    expect(await readFile('assets-application.css')).toBe(await readFixturePath('application.css'));
+  });
+
+  test('script', async () => {
+    expect(await readFile('packs-js-runtime.js')).toBe(await readFixturePath('runtime.js'));
   });
 });
 

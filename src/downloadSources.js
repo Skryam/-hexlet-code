@@ -11,7 +11,7 @@ export default ($, takeURL, pathToFiles, filesName) => {
     const link = $(item).attr('href') || $(item).attr('src');
     new Listr([
       {
-        title: `download re: ${link}`,
+        title: `download resource: ${link}`,
         task: () => {
           if (!link) return;
           const check = new URL(link, takeURL.href);
