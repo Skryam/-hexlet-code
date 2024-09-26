@@ -10,21 +10,22 @@ export default (url, savePath) => {
 
   const baseURLName = generateName(takeURL);
   const pathToSaveHTML = path.join(savePath, baseURLName);
-  const pathToFiles = path.join(savePath, baseURLName.replace('.html', '_files'));
+  const filesDirName = baseURLName.replace('.html', '_files');
+  const pathToFiles = path.join(savePath, filesDirName);
 
   // создание папки для файлов
   return fs.mkdir(pathToFiles)
     .then(() => axios.get(url))
     .then((response) => cheerio.load(response.data))
   // сохранение файлов
-    .then(($) => downloadSources($, takeURL, pathToFiles))
+    .then(($) => downloadSources($, takeURL, pathToFiles, filesDirName))
   // сохранение разметки
     .then(($) => fs.writeFile(pathToSaveHTML, $.html()))
     .then(() => {
       console.log(pathToSaveHTML);
       return pathToSaveHTML;
-    })
-    /*.catch((e) => {
+    });
+  /* .catch((e) => {
       if (e instanceof AxiosError) {
         console.error('ИНЕТ БЛЯ НЕ ГРУЗИТ ААААА');
         throw new Error(e);

@@ -24,7 +24,7 @@ program
   .version('1.0.0', '-V, --version', 'output the version number')
   .arguments('<url>')
   .description('Page loader utility')
-  .option('-o, --output [dir]', 'output dir', cdw())
+  .option('-o, --output [dir]', 'output dir', cwd())
   .action((url, options) => {
     try {
       logic(url, options.output);

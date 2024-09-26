@@ -12,53 +12,58 @@ const readFixturePath = async (filename) => await fs.readFile(path.join(__dirnam
 
 nock.disableNetConnect();
 
-let makeTempDir;
-let courses;
-let nodejsJPG;
-let application;
-let runtime;
+let tempDir;
+let content;
+let imgContent;
+let linkContent;
+let scriptContent;
 beforeAll(async () => {
-  makeTempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'test', 'page-loader-'));
-  courses = await fs.readFile('./__fixtures__/courses.html');
-  nodejsJPG = await fs.readFile('./__fixtures__/nodejs.jpg');
-  application = await fs.readFile('./__fixtures__/application.css');
-  runtime = await fs.readFile('./__fixtures__/runtime.js');
+  tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'test', 'page-loader-'));
+  content = await fs.readFile('./__fixtures__/courses.html');
+  imgContent = await fs.readFile('./__fixtures__/nodejs.jpg');
+  linkContent = await fs.readFile('./__fixtures__/application.css');
+  scriptContent = await fs.readFile('./__fixtures__/runtime.js');
 });
 
-const readFile = async (fileName) => await fs.readFile(path.join(makeTempDir, 'ru-hexlet-io-courses_files', `ru-hexlet-io-${fileName}`), 'utf-8');
+const readFile = async (fileName) => await fs.readFile(path.join(tempDir, 'ru-hexlet-io-courses_files', `ru-hexlet-io-${fileName}`), 'utf-8');
 
-test('get http', async () => {
-  nock('https://ru.hexlet.io')
-    .get('/courses')
-    .reply(200, courses)
-    .get('/courses')
-    .reply(200, courses)
-    .get('/assets/professions/nodejs.jpg')
-    .reply(200, nodejsJPG)
-    .get('/assets/application.css')
-    .reply(200, application)
-    .get('/packs/js/runtime.js')
-    .reply(200, runtime);
+describe('Загрузка разметки и файлов', () => {
+  test('http', async () => {
+    nock('https://ru.hexlet.io')
+      .get('/courses')
+      .reply(200, content)
+      .get('/courses')
+      .reply(200, content)
+      .get('/assets/professions/nodejs.jpg')
+      .reply(200, imgContent)
+      .get('/assets/application.css')
+      .reply(200, linkContent)
+      .get('/packs/js/runtime.js')
+      .reply(200, scriptContent);
 
-  await logic('https://ru.hexlet.io/courses', makeTempDir);
+    await logic('https://ru.hexlet.io/courses', tempDir);
 
-  expect(await readFile('assets-professions-nodejs.jpg')).toBe(await readFixturePath('nodejs.jpg'));
+    expect(await fs.readFile(path.join(tempDir, 'ru-hexlet-io-courses.html'), 'utf-8'))
+      .toBe(await readFixturePath('shouldBe.html'));
+  });
+
+  test('img', async () => {
+    expect(readFile('assets-professions-nodejs.jpg')).toBe(readFixturePath('nodejs.jpg'));
+  });
 });
 
-/* test('error 400', async () => {
-  nock('https://ru.hexlet.io')
-    .get('/courses')
-    .reply(400);
+describe('Ошибки', () => {
+  test('error 400', async () => {
+    await expect(logic('https://ru.hexlet.io/courses', tempDir)).rejects.toThrowError();
+  });
 
-  await expect(logic('https://ru.hexlet.io/courses', makeTempDir)).rejects.toThrowError();
+  test('Ошибочный путь к сохранению', async () => {
+    nock('https://ru.hexlet.io')
+      .get('/courses')
+      .reply(200);
+
+    await expect(logic('https://ru.hexlet.io/courses', 'error')).rejects.toThrowError();
+  });
 });
 
-test('ошибочный путь к сохранению', async () => {
-  nock('https://ru.hexlet.io')
-    .get('/courses')
-    .reply(200);
-
-  await expect(logic('https://ru.hexlet.io/courses', 'error')).rejects.toThrowError();
-}); */
-
-// afterAll(async () => rmdirSync(makeTempDir, { recursive: true }));
+// afterAll(async () => rmdirSync(tempDir, { recursive: true }));
