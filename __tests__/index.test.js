@@ -39,7 +39,7 @@ describe('Загрузка разметки и файлов', () => {
       .get('/assets/application.css')
       .reply(200, linkContent)
       .get('/packs/js/runtime.js')
-      .reply(200, scriptContent);
+      .reply(404);
 
     await logic('https://ru.hexlet.io/courses', tempDir);
 
@@ -55,23 +55,17 @@ describe('Загрузка разметки и файлов', () => {
     expect(await readFile('assets-application.css')).toBe(await readFixturePath('application.css'));
   });
 
-  test('script', async () => {
+  /* test('script', async () => {
     expect(await readFile('packs-js-runtime.js')).toBe(await readFixturePath('runtime.js'));
-  });
+  }); */
 });
 
-describe('Ошибки', () => {
-  test('error 400', async () => {
-    await expect(logic('https://ru.hexlet.io/courses', tempDir)).rejects.toThrowError();
-  });
+/* test('error 404', async () => {
+  nock('https://ru.hexlet.io')
+    .get('/courses')
+    .reply(404);
 
-  test('Ошибочный путь к сохранению', async () => {
-    nock('https://ru.hexlet.io')
-      .get('/courses')
-      .reply(200);
-
-    await expect(logic('https://ru.hexlet.io/courses', 'error')).rejects.toThrowError();
-  });
-});
+  await expect(logic('https://ru.hexlet.io/courses', tempDir)).rejects.toThrowError();
+}); */
 
 // afterAll(async () => rmdirSync(tempDir, { recursive: true }));

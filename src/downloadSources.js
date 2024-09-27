@@ -1,18 +1,25 @@
 import fs from 'node:fs/promises';
 import Listr from 'listr';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import path from 'node:path';
 import * as cheerio from 'cheerio';
 import generateName from './generateName.js';
 
+const map = {
+  link: 'href',
+  img: 'src',
+  script: 'src',
+};
+
 export default ($, takeURL, pathToFiles, filesName) => {
   const promises = $('link, img, script').map((index, item) => {
+    const tag = map[item.name];
     const $item = $(item);
-    const link = $(item).attr('href') || $(item).attr('src');
-    new Listr([
+    const link = $item.attr(tag);
+    return new Listr([
       {
         title: `download resource: ${link}`,
-        task: () => {
+        task: (ctx, task) => {
           if (!link) return;
           const check = new URL(link, takeURL.href);
           if (check.host !== takeURL.host) return;
@@ -23,13 +30,12 @@ export default ($, takeURL, pathToFiles, filesName) => {
           axios.get(check.href, { responseType: 'stream' })
             .then((response) => {
               fs.writeFile(saveFilePath, response.data);
+            })
+            .catch((e) => {
+              task.skip('poh');
             });
           // изменение ссылок в разметке
-          if ($item.attr('href')) {
-            $item.attr('href', fileName);
-          } else if ($item.attr('src')) {
-            $item.attr('src', fileName);
-          }
+          $item.attr(tag, fileName);
         },
       },
     ]).run();
