@@ -27,10 +27,11 @@ export default ($, takeURL, pathToFiles, filesName) => {
           const saveFilePath = path.join(pathToFiles, generateName(check));
           const fileName = path.join(filesName, generateName(check));
 
+          $item.attr(tag, fileName);
+
           return axios.get(check.href, { responseType: 'stream' })
             .then((response) => {
-              fs.writeFile(saveFilePath, response.data);
-              $item.attr(tag, fileName);
+              return fs.writeFile(saveFilePath, response.data);
             })
             .catch((e) => {
               if (e instanceof AxiosError && e.status === 404) {

@@ -18,7 +18,7 @@ let imgContent;
 let linkContent;
 let scriptContent;
 beforeAll(async () => {
-  tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'test', 'page-loader-'));
+  tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'page-loader-'));
   content = await fs.readFile('./__fixtures__/courses.html');
   imgContent = await fs.readFile('./__fixtures__/nodejs.jpg');
   linkContent = await fs.readFile('./__fixtures__/application.css');
@@ -39,7 +39,7 @@ describe('Загрузка разметки и файлов', () => {
       .get('/assets/application.css')
       .reply(200, linkContent)
       .get('/packs/js/runtime.js')
-      .reply(404);
+      .reply(200, scriptContent);
 
     await logic('https://ru.hexlet.io/courses', tempDir);
 
@@ -55,17 +55,17 @@ describe('Загрузка разметки и файлов', () => {
     expect(await readFile('assets-application.css')).toBe(await readFixturePath('application.css'));
   });
 
-  /* test('script', async () => {
+  test('script', async () => {
     expect(await readFile('packs-js-runtime.js')).toBe(await readFixturePath('runtime.js'));
-  }); */
+  });
 });
 
-/* test('error 404', async () => {
+test('error 404', async () => {
   nock('https://ru.hexlet.io')
     .get('/courses')
     .reply(404);
 
   await expect(logic('https://ru.hexlet.io/courses', tempDir)).rejects.toThrowError();
-}); */
+});
 
-// afterAll(async () => rmdirSync(tempDir, { recursive: true }));
+afterAll(async () => rmdirSync(tempDir, { recursive: true }));
