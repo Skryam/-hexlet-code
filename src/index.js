@@ -16,7 +16,7 @@ export default (url, savePath) => {
 
   return new Listr([
     {
-      title: `download http`,
+      title: `download page`,
       task: (ctx, task) => {
         return fs.mkdir(pathToFiles)
         .then(() => axios.get(url))
@@ -25,18 +25,15 @@ export default (url, savePath) => {
         .then(($) => downloadSources($, takeURL, pathToFiles, filesDirName))
       // сохранение разметки
         .then(($) => fs.writeFile(pathToSaveHTML, $.html()))
-        .then(() => {
-          console.log(pathToSaveHTML);
-          return pathToSaveHTML;
-        })
-        /*.catch((e) => {
+        .then(() => pathToSaveHTML)
+        .catch((e) => {
           if (e instanceof AxiosError) {
             console.error('err axious');
             throw new Error(e);
           }
           console.error('err file');
           throw new Error(e);
-        });*/
+        });
       }
     }
   ]).run()

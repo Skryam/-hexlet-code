@@ -26,7 +26,9 @@ program
   .description('Page loader utility')
   .option('-o, --output [dir]', 'output dir', cwd())
   .action((url, options) => {
-      logic(url, options.output).catch((e) => {
+      return logic(url, options.output)
+      .then((path) => console.log(`Loaded successfully and saved at path: ${path}`))
+      .catch(() => {
       process.exit(1);
     })
   });

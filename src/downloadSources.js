@@ -18,28 +18,26 @@ export default ($, takeURL, pathToFiles, filesName) => {
     const link = $item.attr(tag);
     return new Listr([
       {
-        title: `download resource: ${link}`,
+        title: `download source: ${link}`,
         task: (ctx, task) => {
           if (!link) return;
-          const check = new URL(link, takeURL.href);
-          if (check.host !== takeURL.host) return;
+          const url = new URL(link, takeURL.href);
+          if (url.host !== takeURL.host) return;
 
-          const saveFilePath = path.join(pathToFiles, generateName(check));
-          const fileName = `${filesName}/${generateName(check)}`;
+          const saveFilePath = path.join(pathToFiles, generateName(url));
+          const fileName = `${filesName}/${generateName(url)}`;
 
           $item.attr(tag, fileName);
 
-          return axios.get(check.href, { responseType: 'stream' })
+          return axios.get(url.href, { responseType: 'stream' })
             .then((response) => {
               return fs.writeFile(saveFilePath, response.data);
             })
             .catch((e) => {
               if (e instanceof AxiosError && e.status === 404) {
-                task.skip(`Resource ${e.config.url} not found!`);
-              }
+                return task.skip(`Resource ${e.config.url} not found!`);
+              } throw e;
             });
-          // изменение ссылок в разметке
-          
         },
       },
     ]).run();
