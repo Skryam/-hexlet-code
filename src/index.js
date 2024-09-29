@@ -29,14 +29,14 @@ export default (url, savePath) => {
           console.log(pathToSaveHTML);
           return pathToSaveHTML;
         })
-        .catch((e) => {
+        /*.catch((e) => {
           if (e instanceof AxiosError) {
             console.error('err axious');
             throw new Error(e);
           }
           console.error('err file');
           throw new Error(e);
-        });
+        });*/
       }
     }
   ]).run()
