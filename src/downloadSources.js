@@ -25,7 +25,7 @@ export default ($, takeURL, pathToFiles, filesName) => {
           if (check.host !== takeURL.host) return;
 
           const saveFilePath = path.join(pathToFiles, generateName(check));
-          const fileName = path.join(filesName, generateName(check));
+          const fileName = `${filesName}/${generateName(check)}`;
 
           $item.attr(tag, fileName);
 
