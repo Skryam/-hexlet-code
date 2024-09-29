@@ -1,8 +1,8 @@
 import axios, { AxiosError } from 'axios';
+import Listr from 'listr';
 import * as cheerio from 'cheerio';
 import path from 'node:path';
 import fs from 'node:fs/promises';
-import Listr from 'listr';
 import generateName from './generateName.js';
 import downloadSources from './downloadSources.js';
 
@@ -14,23 +14,30 @@ export default (url, savePath) => {
   const filesDirName = baseURLName.replace('.html', '_files');
   const pathToFiles = path.join(savePath, filesDirName);
 
-  return fs.mkdir(pathToFiles)
-    .then(() => axios.get(url))
-    .then((response) => cheerio.load(response.data))
-  // сохранение файлов
-    .then(($) => downloadSources($, takeURL, pathToFiles, filesDirName))
-  // сохранение разметки
-    .then(($) => fs.writeFile(pathToSaveHTML, $.html()))
-    .then(() => {
-      console.log(pathToSaveHTML);
-      return pathToSaveHTML;
-    })
-    .catch((e) => {
-      if (e instanceof AxiosError) {
-        console.error(e);
-        throw new Error(e);
+  return new Listr([
+    {
+      title: `download http`,
+      task: (ctx, task) => {
+        return fs.mkdir(pathToFiles)
+        .then(() => axios.get(url))
+        .then((response) => cheerio.load(response.data))
+      // сохранение файлов
+        .then(($) => downloadSources($, takeURL, pathToFiles, filesDirName))
+      // сохранение разметки
+        .then(($) => fs.writeFile(pathToSaveHTML, $.html()))
+        .then(() => {
+          console.log(pathToSaveHTML);
+          return pathToSaveHTML;
+        })
+        .catch((e) => {
+          if (e instanceof AxiosError) {
+            console.error('err axious');
+            throw new Error(e);
+          }
+          console.error('err file');
+          throw new Error(e);
+        });
       }
-      console.error(e);
-      throw new Error(e);
-    });
+    }
+  ]).run()
 };

@@ -27,15 +27,18 @@ export default ($, takeURL, pathToFiles, filesName) => {
           const saveFilePath = path.join(pathToFiles, generateName(check));
           const fileName = path.join(filesName, generateName(check));
 
-          axios.get(check.href, { responseType: 'stream' })
+          return axios.get(check.href, { responseType: 'stream' })
             .then((response) => {
               fs.writeFile(saveFilePath, response.data);
+              $item.attr(tag, fileName);
             })
             .catch((e) => {
-              task.skip('poh');
+              if (e instanceof AxiosError && e.status === 404) {
+                task.skip(`Resource ${e.config.url} not found!`);
+              }
             });
           // изменение ссылок в разметке
-          $item.attr(tag, fileName);
+          
         },
       },
     ]).run();

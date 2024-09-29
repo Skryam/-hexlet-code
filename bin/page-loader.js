@@ -26,11 +26,9 @@ program
   .description('Page loader utility')
   .option('-o, --output [dir]', 'output dir', cwd())
   .action((url, options) => {
-    try {
-      logic(url, options.output);
-    } catch (e) {
+      logic(url, options.output).catch((e) => {
       process.exit(1);
-    }
+    })
   });
 
 program.parse(process.argv);
