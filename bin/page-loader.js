@@ -4,7 +4,6 @@ import { program } from 'commander';
 import axiosDebug from 'axios-debug-log';
 import logic from '../src/index.js';
 
-// Log content type
 axiosDebug({
   request(debug, config) {
     debug(`Request with ${config.headers['content-type']}`);
@@ -25,12 +24,10 @@ program
   .arguments('<url>')
   .description('Page loader utility')
   .option('-o, --output [dir]', 'output dir', cwd())
-  .action((url, options) => {
-    return logic(url, options.output)
-      .then((path) => console.log(`Loaded successfully and saved at path: ${path}`))
-      .catch(() => {
-        process.exit(1);
-      });
-  });
+  .action((url, options) => logic(url, options.output)
+    .then((path) => console.log(`Loaded successfully and saved at path: ${path}`))
+    .catch(() => {
+      process.exit(1);
+    }));
 
 program.parse(process.argv);

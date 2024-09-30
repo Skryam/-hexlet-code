@@ -29,9 +29,7 @@ export default ($, takeURL, pathToFiles, filesName) => {
           $item.attr(tag, fileName);
 
           return axios.get(url.href, { responseType: 'stream' })
-            .then((response) => {
-              return fs.writeFile(saveFilePath, response.data);
-            })
+            .then((response) => fs.writeFile(saveFilePath, response.data))
             .catch((e) => {
               if (e instanceof AxiosError) {
                 return task.skip(`Resource ${e.config.url} could not be downloaded at the moment`);
