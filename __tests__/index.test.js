@@ -64,7 +64,7 @@ describe('Errors axios & node files', () => {
   test('response 400', async () => {
     nock('https://ru.hexlet.io')
       .get('/courses')
-     .reply(400);
+      .reply(400);
 
     await expect(logic('https://ru.hexlet.io/courses', tempDir)).rejects.toThrowError();
   });
@@ -76,6 +76,6 @@ describe('Errors axios & node files', () => {
 
     await expect(logic('https://ru.hexlet.io/courses', 'errorPath')).rejects.toThrowError();
   });
-})
+});
 
 afterAll(async () => rmdirSync(tempDir, { recursive: true }));

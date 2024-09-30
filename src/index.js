@@ -16,25 +16,27 @@ export default (url, savePath) => {
 
   return new Listr([
     {
-      title: `download page`,
-      task: (ctx, task) => {
+      title: 'download page',
+      task: () => {
         return fs.mkdir(pathToFiles)
-        .then(() => axios.get(url))
-        .then((response) => cheerio.load(response.data))
-      // сохранение файлов
-        .then(($) => downloadSources($, takeURL, pathToFiles, filesDirName))
-      // сохранение разметки
-        .then(($) => fs.writeFile(pathToSaveHTML, $.html()))
-        .then(() => pathToSaveHTML)
-        .catch((e) => {
-          if (e instanceof AxiosError) {
-            console.error('err axious');
+          .then(() => axios.get(url))
+          .then((response) => cheerio.load(response.data))
+        // сохранение файлов
+          .then(($) => downloadSources($, takeURL, pathToFiles, filesDirName))
+        // сохранение разметки
+          .then(($) => fs.writeFile(pathToSaveHTML, $.html()))
+          .then(() => pathToSaveHTML)
+          .catch((e) => {
+            if (e instanceof AxiosError) {
+              console.error('htpp error');
+              throw new Error(e);
+            } else if (e.code) {
+              console.error('File system error');
+              throw new Error(e);
+            }
             throw new Error(e);
-          }
-          console.error('err file');
-          throw new Error(e);
-        });
-      }
-    }
-  ]).run()
+          });
+      },
+    },
+  ]).run();
 };

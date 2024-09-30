@@ -2,7 +2,6 @@ import fs from 'node:fs/promises';
 import Listr from 'listr';
 import axios, { AxiosError } from 'axios';
 import path from 'node:path';
-import * as cheerio from 'cheerio';
 import generateName from './generateName.js';
 
 const map = {
@@ -34,8 +33,8 @@ export default ($, takeURL, pathToFiles, filesName) => {
               return fs.writeFile(saveFilePath, response.data);
             })
             .catch((e) => {
-              if (e instanceof AxiosError && e.status === 404) {
-                return task.skip(`Resource ${e.config.url} not found!`);
+              if (e instanceof AxiosError) {
+                return task.skip(`Resource ${e.config.url} could not be downloaded at the moment`);
               } throw e;
             });
         },

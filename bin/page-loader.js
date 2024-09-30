@@ -26,11 +26,11 @@ program
   .description('Page loader utility')
   .option('-o, --output [dir]', 'output dir', cwd())
   .action((url, options) => {
-      return logic(url, options.output)
+    return logic(url, options.output)
       .then((path) => console.log(`Loaded successfully and saved at path: ${path}`))
       .catch(() => {
-      process.exit(1);
-    })
+        process.exit(1);
+      });
   });
 
 program.parse(process.argv);
